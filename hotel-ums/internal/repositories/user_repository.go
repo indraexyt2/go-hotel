@@ -50,6 +50,15 @@ func (r *UserRepository) GetUserById(ctx context.Context, id int) (*models.User,
 	return &user, nil
 }
 
+func (r *UserRepository) GetAllUsers(ctx context.Context) ([]models.User, error) {
+	var users []models.User
+	err := r.DB.WithContext(ctx).Where("role != ?", "admin").Omit("password").Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (r *UserRepository) GetEmailVerificationToken(ctx context.Context, tokenVerify string) (*models.EmailVerificationToken, error) {
 	var emailVerificationToken *models.EmailVerificationToken
 	err := r.DB.WithContext(ctx).Where("token = ?", tokenVerify).First(&emailVerificationToken).Error
