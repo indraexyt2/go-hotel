@@ -110,3 +110,7 @@ func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string
 func (r *UserRepository) UpdateUserSession(ctx context.Context, token, refreshToken string) error {
 	return r.DB.WithContext(ctx).Model(&models.UserSession{}).Where("refresh_token = ?", refreshToken).Update("token", token).Error
 }
+
+func (r *UserRepository) DeleteUserSession(ctx context.Context, token string) error {
+	return r.DB.WithContext(ctx).Where("token = ?", token).Delete(&models.UserSession{}).Error
+}
