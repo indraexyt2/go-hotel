@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"hotel-ums/internal/models"
 	"os"
 )
 
@@ -23,6 +24,12 @@ func SetupDB() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		Logger.Error("Failed to connect to database: ", err)
+		return
+	}
+
+	err = DB.AutoMigrate(&models.User{}, &models.UserSession{}, &models.EmailVerificationToken{})
+	if err != nil {
+		Logger.Error("Failed to migrate database: ", err)
 		return
 	}
 
