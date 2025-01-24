@@ -48,7 +48,7 @@ func GenerateToken(ctx context.Context, userID int, userFullName, userEmail, use
 
 func ValidateToken(ctx context.Context, token string) (*Claims, error) {
 	var (
-		claims *Claims
+		claims = &Claims{}
 		ok     bool
 	)
 
