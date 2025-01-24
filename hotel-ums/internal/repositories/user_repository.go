@@ -79,3 +79,25 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) erro
 func (r *UserRepository) AddUserSession(ctx context.Context, userSession *models.UserSession) error {
 	return r.DB.WithContext(ctx).Create(userSession).Error
 }
+
+func (r *UserRepository) GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error) {
+	var userSession models.UserSession
+	err := r.DB.WithContext(ctx).Where("refresh_token = ?", refreshToken).First(&userSession).Error
+	if err != nil {
+		return nil, err
+	}
+	return &userSession, nil
+}
+
+func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error) {
+	var userSession models.UserSession
+	err := r.DB.WithContext(ctx).Where("token = ?", token).First(&userSession).Error
+	if err != nil {
+		return nil, err
+	}
+	return &userSession, nil
+}
+
+func (r *UserRepository) UpdateUserSession(ctx context.Context, token, refreshToken string) error {
+	return r.DB.WithContext(ctx).Model(&models.UserSession{}).Where("refresh_token = ?", refreshToken).Update("token", token).Error
+}

@@ -16,4 +16,7 @@ type IUserRepository interface {
 	UpdateEmailVerificationToken(ctx context.Context, emailVerificationToken *models.EmailVerificationToken) error
 
 	AddUserSession(ctx context.Context, userSession *models.UserSession) error
+	GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error)
+	GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error)
+	UpdateUserSession(ctx context.Context, token, refreshToken string) error
 }

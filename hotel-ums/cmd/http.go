@@ -23,6 +23,7 @@ func ServeHTTP() {
 	umsV1.PUT("/email-verification/:token", d.RegisterAPI.EmailVerification)
 	umsV1.GET("/email-verification", d.RegisterAPI.ResendEmailVerification)
 	umsV1.POST("/login", d.LoginAPI.Login)
+	umsV1.PUT("/refresh-token", d.LoginAPI.RefreshToken, d.MiddlewareValidateAuthByRefreshToken)
 
 	err := e.Start(":" + os.Getenv("UMS_APP_PORT"))
 	if err != nil {
@@ -31,6 +32,8 @@ func ServeHTTP() {
 }
 
 type Dependencies struct {
+	UserRepo interfaces.IUserRepository
+
 	RegisterAPI interfaces.IUserRegisterAPI
 	LoginAPI    interfaces.IUserLoginAPI
 }
@@ -45,6 +48,7 @@ func DependencyInjection() *Dependencies {
 	loginApi := api.NewLoginAPI(loginSvc)
 
 	return &Dependencies{
+		UserRepo:    userRepo,
 		RegisterAPI: registerApi,
 		LoginAPI:    loginApi,
 	}

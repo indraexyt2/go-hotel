@@ -39,3 +39,25 @@ func (api *LoginAPI) Login(e echo.Context) error {
 
 	return helpers.SendResponse(e, 200, "success", resp)
 }
+
+func (api *LoginAPI) RefreshToken(e echo.Context) error {
+	var (
+		log = helpers.Logger
+	)
+
+	token := e.Request().Header.Get("Authorization")
+	claims := e.Get("token")
+	claimsToken, ok := claims.(*helpers.Claims)
+	if !ok {
+		log.Error("error getting claims token")
+		return helpers.SendResponse(e, 500, "server error", nil)
+	}
+
+	resp, err := api.LoginService.RefreshToken(e.Request().Context(), token, claimsToken)
+	if err != nil {
+		log.Error("failed to update token: ", err)
+		return helpers.SendResponse(e, 401, err.Error(), nil)
+	}
+
+	return helpers.SendResponse(e, 200, "success", resp)
+}
