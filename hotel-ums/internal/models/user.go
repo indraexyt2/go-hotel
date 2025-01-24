@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// User Model
 type User struct {
 	ID                     int                    `json:"id" gorm:"primaryKe;autoIncrement"`
 	PhotoPath              string                 `json:"photo_path" gorm:"type:varchar(255)"`
@@ -30,6 +31,7 @@ func (u *User) Validate() error {
 	return v.Struct(u)
 }
 
+// EmailVerificationToken Model
 type EmailVerificationToken struct {
 	ID        int       `json:"id" gorm:"primaryKey;autoIncrement"`
 	UserID    int       `json:"user_id" gorm:"type:int"`
@@ -42,6 +44,7 @@ func (*EmailVerificationToken) TableName() string {
 	return "email_verification_tokens"
 }
 
+// UserSession Model
 type UserSession struct {
 	ID           int       `json:"id" gorm:"primaryKey;autoIncrement"`
 	UserID       int       `json:"user_id" gorm:"type:int"`
@@ -53,4 +56,14 @@ type UserSession struct {
 
 func (*UserSession) TableName() string {
 	return "user_sessions"
+}
+
+// ResendEmailVerificationRequest Request
+type ResendEmailVerificationRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+func (I *ResendEmailVerificationRequest) Validate() error {
+	v := validator.New()
+	return v.Struct(I)
 }

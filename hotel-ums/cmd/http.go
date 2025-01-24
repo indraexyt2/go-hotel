@@ -21,6 +21,7 @@ func ServeHTTP() {
 	umsV1 := e.Group("/api/ums/v1")
 	umsV1.POST("/register", d.RegisterAPI.RegisterNewUser)
 	umsV1.PUT("/email-verification/:token", d.RegisterAPI.EmailVerification)
+	umsV1.GET("/email-verification", d.RegisterAPI.ResendEmailVerification)
 
 	err := e.Start(":" + os.Getenv("UMS_APP_PORT"))
 	if err != nil {

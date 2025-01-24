@@ -50,10 +50,19 @@ func (r *UserRepository) GetEmailVerificationToken(ctx context.Context, tokenVer
 	return emailVerificationToken, nil
 }
 
-func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) error {
-	return r.DB.WithContext(ctx).Save(user).Error
+func (r *UserRepository) GetEmailVerificationTokenById(ctx context.Context, userID int) (*models.EmailVerificationToken, error) {
+	var emailVerificationToken *models.EmailVerificationToken
+	err := r.DB.WithContext(ctx).Where("user_id = ?", userID).First(&emailVerificationToken).Error
+	if err != nil {
+		return nil, err
+	}
+	return emailVerificationToken, nil
 }
 
 func (r *UserRepository) UpdateEmailVerificationToken(ctx context.Context, emailVerificationToken *models.EmailVerificationToken) error {
 	return r.DB.WithContext(ctx).Save(emailVerificationToken).Error
+}
+
+func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) error {
+	return r.DB.WithContext(ctx).Save(user).Error
 }

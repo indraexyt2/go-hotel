@@ -61,3 +61,24 @@ func (api *RegisterAPI) EmailVerification(e echo.Context) error {
 
 	return helpers.SendResponse(e, 200, "success", nil)
 }
+
+func (api *RegisterAPI) ResendEmailVerification(e echo.Context) error {
+	var (
+		log = helpers.Logger
+		req = &models.ResendEmailVerificationRequest{}
+	)
+
+	if err := e.Bind(req); err != nil {
+		log.Error("Failed to bind request: ", err)
+		return helpers.SendResponse(e, 400, err.Error(), nil)
+	}
+
+	err := api.RegisterService.ResendEmailVerification(e.Request().Context(), req.Email)
+	if err != nil {
+		log.Error("Failed to resend email verification: ", err)
+		return helpers.SendResponse(e, 500, err.Error(), nil)
+	}
+
+	return helpers.SendResponse(e, 200, "success", nil)
+
+}

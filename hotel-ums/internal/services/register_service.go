@@ -89,3 +89,34 @@ func (s *RegisterService) EmailVerification(ctx context.Context, tokenVerify str
 
 	return nil
 }
+
+func (s *RegisterService) ResendEmailVerification(ctx context.Context, email string) error {
+	userData, err := s.UserRepository.GetUserByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+	if userData.IsVerified == true {
+		return errors.New("user already verified")
+	}
+
+	verificationTokenData, err := s.UserRepository.GetEmailVerificationTokenById(ctx, userData.ID)
+	if err != nil {
+		return err
+	}
+
+	tokenByte := make([]byte, 32)
+	_, err = rand.Read(tokenByte)
+	if err != nil {
+		return err
+	}
+
+	verificationTokenData.Token = base64.URLEncoding.EncodeToString(tokenByte)
+	verificationTokenData.ExpiresAt = time.Now().Add(time.Hour * 24)
+
+	err = s.UserRepository.UpdateEmailVerificationToken(ctx, verificationTokenData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
