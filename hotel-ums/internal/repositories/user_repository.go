@@ -32,6 +32,15 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	return &user, nil
 }
 
+func (r *UserRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+	var user models.User
+	err := r.DB.WithContext(ctx).Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *UserRepository) GetUserById(ctx context.Context, id int) (*models.User, error) {
 	var user models.User
 	err := r.DB.WithContext(ctx).Where("id = ?", id).First(&user).Error
@@ -65,4 +74,8 @@ func (r *UserRepository) UpdateEmailVerificationToken(ctx context.Context, email
 
 func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) error {
 	return r.DB.WithContext(ctx).Save(user).Error
+}
+
+func (r *UserRepository) AddUserSession(ctx context.Context, userSession *models.UserSession) error {
+	return r.DB.WithContext(ctx).Create(userSession).Error
 }

@@ -58,7 +58,7 @@ func (*UserSession) TableName() string {
 	return "user_sessions"
 }
 
-// ResendEmailVerificationRequest Request
+// Request
 type ResendEmailVerificationRequest struct {
 	Email string `json:"email" validate:"required,email"`
 }
@@ -66,4 +66,22 @@ type ResendEmailVerificationRequest struct {
 func (I *ResendEmailVerificationRequest) Validate() error {
 	v := validator.New()
 	return v.Struct(I)
+}
+
+type LoginRequest struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+func (I *LoginRequest) Validate() error {
+	v := validator.New()
+	return v.Struct(I)
+}
+
+// Response
+type LoginResponse struct {
+	UserID       int    `json:"user_id"`
+	FullName     string `json:"full_name"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 }
