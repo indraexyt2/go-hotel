@@ -20,4 +20,6 @@ type IUserRepository interface {
 	GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error)
 	GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error)
 	UpdateUserSession(ctx context.Context, token, refreshToken string) error
+
+	DeleteUserSession(ctx context.Context, token string) error
 }

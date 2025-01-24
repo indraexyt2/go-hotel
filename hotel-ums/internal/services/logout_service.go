@@ -13,6 +13,6 @@ func NewLogoutService(userRepository interfaces.IUserRepository) *LogoutService 
 	return &LogoutService{UserRepository: userRepository}
 }
 
-func (s *LogoutService) Logout(ctx context.Context, token int) error {
+func (s *LogoutService) Logout(ctx context.Context, token string) error {
 	return s.UserRepository.DeleteUserSession(ctx, token)
 }
