@@ -23,6 +23,11 @@ func ServeHTTP() {
 	umsV1.PUT("/email-verification/:token", d.RegisterAPI.EmailVerification)
 	umsV1.GET("/email-verification", d.RegisterAPI.ResendEmailVerification)
 	umsV1.POST("/login", d.LoginAPI.Login)
+	umsV1.PUT("/refresh-token", d.LoginAPI.RefreshToken, d.MiddlewareValidateAuthByRefreshToken)
+	umsV1.GET("/user", d.GetUserAPI.GetUser, d.MiddlewareValidateAuthByToken)
+	umsV1.GET("/users", d.GetUserAPI.GetAllUsers, d.MiddlewareValidateAdminAuth)
+	umsV1.PUT("/profile/:userID", d.ProfileAPI.UpdateUserProfile, d.MiddlewareValidateAuthByToken)
+	umsV1.DELETE("/logout", d.LogoutAPI.Logout, d.MiddlewareValidateAuthByToken)
 
 	err := e.Start(":" + os.Getenv("UMS_APP_PORT"))
 	if err != nil {
@@ -31,8 +36,13 @@ func ServeHTTP() {
 }
 
 type Dependencies struct {
+	UserRepo interfaces.IUserRepository
+
 	RegisterAPI interfaces.IUserRegisterAPI
 	LoginAPI    interfaces.IUserLoginAPI
+	GetUserAPI  interfaces.IGetUserAPI
+	ProfileAPI  interfaces.IProfileAPI
+	LogoutAPI   interfaces.IUserLogoutAPI
 }
 
 func DependencyInjection() *Dependencies {
@@ -44,8 +54,22 @@ func DependencyInjection() *Dependencies {
 	loginSvc := services.NewLoginService(userRepo)
 	loginApi := api.NewLoginAPI(loginSvc)
 
+	getUserSvc := services.NewGetUserService(userRepo)
+	getUserApi := api.NewGetUserAPI(getUserSvc)
+
+	profileSvc := services.NewProfileService(userRepo)
+	profileApi := api.NewProfileAPI(profileSvc)
+
+	logoutSvc := services.NewLogoutService(userRepo)
+	logoutApi := api.NewLogoutAPI(logoutSvc)
+
 	return &Dependencies{
+		UserRepo: userRepo,
+
 		RegisterAPI: registerApi,
 		LoginAPI:    loginApi,
+		GetUserAPI:  getUserApi,
+		ProfileAPI:  profileApi,
+		LogoutAPI:   logoutApi,
 	}
 }

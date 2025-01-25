@@ -62,3 +62,18 @@ func (s *LoginService) Login(ctx context.Context, req *models.LoginRequest) (*mo
 
 	return resp, nil
 }
+
+func (s *LoginService) RefreshToken(ctx context.Context, refreshToken string, claimsToken *helpers.Claims) (*models.RefreshTokenResponse, error) {
+	token, err := helpers.GenerateToken(ctx, claimsToken.UserID, claimsToken.FullName, claimsToken.Email, claimsToken.Role, "token")
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.UserRepository.UpdateUserSession(ctx, token, refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &models.RefreshTokenResponse{Token: refreshToken}
+	return resp, nil
+}
