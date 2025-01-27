@@ -20,7 +20,7 @@ type User struct {
 	IsVerified             bool                   `json:"is_verified" gorm:"default:false"`
 	Source                 string                 `json:"source" gorm:"type:varchar(50)"`
 	CreatedAt              time.Time              `json:"-" gorm:"autoCreateTime"`
-	UpdateAt               time.Time              `json:"-" gorm:"autoCreateTime,autoUpdateTime"`
+	UpdateAt               time.Time              `json:"-" gorm:"autoUpdateTime"`
 }
 
 func (*User) TableName() string {
@@ -55,7 +55,7 @@ type UserSession struct {
 	Source       string    `json:"source" gorm:"type:varchar(50)"`
 	ExpiresAt    time.Time `json:"expires_at,omitempty"`
 	CreatedAt    time.Time `json:"-" gorm:"autoCreateTime"`
-	UpdateAt     time.Time `json:"-" gorm:"autoCreateTime;autoUpdateTime"`
+	UpdateAt     time.Time `json:"-" gorm:"autoUpdateTime"`
 }
 
 func (*UserSession) TableName() string {
