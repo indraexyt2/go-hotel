@@ -205,13 +205,35 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) erro
 }
 
 func (r *UserRepository) AddUserSession(ctx context.Context, userSession *models.UserSession) error {
-	return r.DB.WithContext(ctx).Create(userSession).Error
+	err := r.DB.WithContext(ctx).Create(userSession).Error
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		ctx = context.Background()
+		userSessionJson, err := json.Marshal(userSession)
+		if err != nil {
+			helpers.Logger.Warn("error marshal user data to json")
+			return
+		}
+
+		err = r.Redis.Set(ctx, fmt.Sprintf(constants.RedisKeyUserSession, userSession.Token), string(userSessionJson), time.Hour*24).Err()
+		if err != nil {
+			helpers.Logger.Warn("failed to set user session to redis: ", err)
+			return
+		}
+
+		helpers.Logger.Info("success set user session to redis")
+	}()
+
+	return nil
 }
 
 func (r *UserRepository) GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error) {
 	var userSession models.UserSession
 
-	result, err := r.Redis.Get(ctx, fmt.Sprintf(constants.RedisKeyUserSessionByRefreshToken, refreshToken)).Result()
+	result, err := r.Redis.Get(ctx, fmt.Sprintf(constants.RedisKeyUserSession, refreshToken)).Result()
 	if err == nil && result != "" {
 		if err = json.Unmarshal([]byte(result), &userSession); err != nil {
 			helpers.Logger.Warn("failed to unmarshal data")
@@ -235,7 +257,7 @@ func (r *UserRepository) GetUserSessionByRefreshToken(ctx context.Context, refre
 			return
 		}
 
-		err = r.Redis.Set(ctx, fmt.Sprintf(constants.RedisKeyUserSessionByRefreshToken, refreshToken), string(userSessionJson), time.Hour*24).Err()
+		err = r.Redis.Set(ctx, fmt.Sprintf(constants.RedisKeyUserSession, refreshToken), string(userSessionJson), time.Hour*24).Err()
 		if err != nil {
 			helpers.Logger.Warn("failed to set user session to redis: ", err)
 			return
@@ -249,7 +271,7 @@ func (r *UserRepository) GetUserSessionByRefreshToken(ctx context.Context, refre
 func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error) {
 	var userSession models.UserSession
 
-	result, err := r.Redis.Get(ctx, fmt.Sprintf(constants.RedisKeyUserSessionByToken, token)).Result()
+	result, err := r.Redis.Get(ctx, fmt.Sprintf(constants.RedisKeyUserSession, token)).Result()
 	if err == nil && result != "" {
 		if err = json.Unmarshal([]byte(result), &userSession); err != nil {
 			helpers.Logger.Warn("failed to unmarshal data")
@@ -273,7 +295,7 @@ func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string
 			return
 		}
 
-		err = r.Redis.Set(ctx, fmt.Sprintf(constants.RedisKeyUserSessionByToken, token), string(userSessionJson), time.Hour*24).Err()
+		err = r.Redis.Set(ctx, fmt.Sprintf(constants.RedisKeyUserSession, token), string(userSessionJson), time.Hour*24).Err()
 		if err != nil {
 			helpers.Logger.Warn("failed to set user session to redis: ", err)
 			return
