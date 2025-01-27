@@ -28,6 +28,8 @@ func ServeHTTP() {
 	umsV1.GET("/users", d.GetUserAPI.GetAllUsers, d.MiddlewareValidateAdminAuth)
 	umsV1.PUT("/profile/:userID", d.ProfileAPI.UpdateUserProfile, d.MiddlewareValidateAuthByToken)
 	umsV1.DELETE("/logout", d.LogoutAPI.Logout, d.MiddlewareValidateAuthByToken)
+	umsV1.GET("/auth/google/login", d.OAuth2API.Login)
+	umsV1.GET("/auth/google/callback", d.OAuth2API.LoginCallback)
 
 	err := e.Start(":" + os.Getenv("UMS_APP_PORT"))
 	if err != nil {
@@ -43,6 +45,8 @@ type Dependencies struct {
 	GetUserAPI  interfaces.IGetUserAPI
 	ProfileAPI  interfaces.IProfileAPI
 	LogoutAPI   interfaces.IUserLogoutAPI
+
+	OAuth2API interfaces.IOAuth2API
 }
 
 func DependencyInjection() *Dependencies {
@@ -63,6 +67,9 @@ func DependencyInjection() *Dependencies {
 	logoutSvc := services.NewLogoutService(userRepo)
 	logoutApi := api.NewLogoutAPI(logoutSvc)
 
+	oauth2Svc := services.NewOAuth2Service(userRepo)
+	oauth2Api := api.NewOAuth2API(oauth2Svc)
+
 	return &Dependencies{
 		UserRepo: userRepo,
 
@@ -71,5 +78,7 @@ func DependencyInjection() *Dependencies {
 		GetUserAPI:  getUserApi,
 		ProfileAPI:  profileApi,
 		LogoutAPI:   logoutApi,
+
+		OAuth2API: oauth2Api,
 	}
 }

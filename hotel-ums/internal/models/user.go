@@ -18,6 +18,7 @@ type User struct {
 	Address                string                 `json:"address" gorm:"type:text" form:"address"`
 	EmailVerificationToken EmailVerificationToken `json:"-" gorm:"foreignKey:UserID;references:ID"`
 	IsVerified             bool                   `json:"is_verified" gorm:"default:false"`
+	Source                 string                 `json:"source" gorm:"type:varchar(50)"`
 	CreatedAt              time.Time              `json:"-" gorm:"autoCreateTime"`
 	UpdateAt               time.Time              `json:"-" gorm:"autoCreateTime,autoUpdateTime"`
 }
@@ -50,6 +51,9 @@ type UserSession struct {
 	UserID       int       `json:"user_id" gorm:"type:int"`
 	Token        string    `json:"token" gorm:"type:varchar(255)"`
 	RefreshToken string    `json:"refresh_token" gorm:"type:varchar(255)"`
+	TokenType    string    `json:"token_type" gorm:"type:varchar(50)"`
+	Source       string    `json:"source" gorm:"type:varchar(50)"`
+	ExpiresAt    time.Time `json:"expires_at,omitempty"`
 	CreatedAt    time.Time `json:"-" gorm:"autoCreateTime"`
 	UpdateAt     time.Time `json:"-" gorm:"autoCreateTime;autoUpdateTime"`
 }
@@ -88,4 +92,15 @@ type LoginResponse struct {
 
 type RefreshTokenResponse struct {
 	Token string `json:"token"`
+}
+
+// oauth2
+
+type GoogleUserInfo struct {
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Picture       string `json:"picture"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
 }
