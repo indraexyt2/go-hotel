@@ -7,7 +7,7 @@ import (
 )
 
 type IGetUserService interface {
-	GetUser(ctx context.Context, id int) (*models.User, error)
+	GetUser(ctx context.Context, userEmail string) (*models.User, error)
 	GetAllUsers(ctx context.Context) ([]models.User, error)
 }
 

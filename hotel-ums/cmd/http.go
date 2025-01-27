@@ -26,7 +26,7 @@ func ServeHTTP() {
 	umsV1.PUT("/refresh-token", d.LoginAPI.RefreshToken, d.MiddlewareValidateAuthByRefreshToken)
 	umsV1.GET("/user", d.GetUserAPI.GetUser, d.MiddlewareValidateAuthByToken)
 	umsV1.GET("/users", d.GetUserAPI.GetAllUsers, d.MiddlewareValidateAdminAuth)
-	umsV1.PUT("/profile/:userID", d.ProfileAPI.UpdateUserProfile, d.MiddlewareValidateAuthByToken)
+	umsV1.PUT("/profile", d.ProfileAPI.UpdateUserProfile, d.MiddlewareValidateAuthByToken)
 	umsV1.DELETE("/logout", d.LogoutAPI.Logout, d.MiddlewareValidateAuthByToken)
 	umsV1.GET("/auth/google/login", d.OAuth2API.Login)
 	umsV1.GET("/auth/google/callback", d.OAuth2API.LoginCallback)
@@ -62,7 +62,7 @@ func DependencyInjection() *Dependencies {
 	getUserApi := api.NewGetUserAPI(getUserSvc)
 
 	profileSvc := services.NewProfileService(userRepo)
-	profileApi := api.NewProfileAPI(profileSvc)
+	profileApi := api.NewProfileAPI(profileSvc, userRepo)
 
 	logoutSvc := services.NewLogoutService(userRepo)
 	logoutApi := api.NewLogoutAPI(logoutSvc)

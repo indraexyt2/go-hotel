@@ -24,7 +24,7 @@ func (s *IOAuth2Service) GoogleLogin(ctx context.Context, req *models.GoogleUser
 			Password:   "",
 			Email:      req.Email,
 			Role:       "guest",
-			FullName:   req.GivenName + " " + req.Name,
+			FullName:   req.Name,
 			IsVerified: req.EmailVerified,
 			Source:     "google",
 		}

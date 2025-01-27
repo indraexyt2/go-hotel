@@ -15,17 +15,49 @@ import (
 
 type ProfileAPI struct {
 	ProfileService interfaces.IProfileService
+	UserRepository interfaces.IUserRepository
 }
 
-func NewProfileAPI(profileService interfaces.IProfileService) *ProfileAPI {
-	return &ProfileAPI{ProfileService: profileService}
+func NewProfileAPI(profSvc interfaces.IProfileService, userRepo interfaces.IUserRepository) *ProfileAPI {
+	return &ProfileAPI{
+		ProfileService: profSvc,
+		UserRepository: userRepo,
+	}
 }
 
 func (api *ProfileAPI) UpdateUserProfile(e echo.Context) error {
 	var (
-		log = helpers.Logger
-		req = &models.User{}
+		log    = helpers.Logger
+		req    = &models.User{}
+		userID int
 	)
+
+	token := e.Get("token")
+	switch token.(type) {
+	case *helpers.Claims:
+		claimsToken, ok := token.(*helpers.Claims)
+		if !ok {
+			log.Error("error getting token")
+			return helpers.SendResponse(e, 500, "server error", nil)
+		}
+		userID = claimsToken.UserID
+	case *models.GoogleUserInfo:
+		claimsToken, ok := token.(*models.GoogleUserInfo)
+		if !ok {
+			log.Error("error getting token")
+			return helpers.SendResponse(e, 500, "server error", nil)
+		}
+
+		user, err := api.UserRepository.GetUserByEmail(e.Request().Context(), claimsToken.Email)
+		if err != nil {
+			log.Error("failed to get user: ", err)
+			return helpers.SendResponse(e, 500, err.Error(), nil)
+		}
+		userID = user.ID
+	default:
+		log.Error("error getting token")
+		return helpers.SendResponse(e, 500, "server error", nil)
+	}
 
 	photoSrc, err := e.FormFile("file")
 	if err != nil {
@@ -71,14 +103,7 @@ func (api *ProfileAPI) UpdateUserProfile(e echo.Context) error {
 		return helpers.SendResponse(e, 400, err.Error(), nil)
 	}
 
-	token := e.Get("token")
-	claimsToken, ok := token.(*helpers.Claims)
-	if !ok {
-		log.Error("error getting token")
-		return helpers.SendResponse(e, 500, "server error", nil)
-	}
-
-	resp, err := api.ProfileService.UpdateUserProfile(e.Request().Context(), req, relativePath, claimsToken.UserID)
+	resp, err := api.ProfileService.UpdateUserProfile(e.Request().Context(), req, relativePath, userID)
 	if err != nil {
 		log.Error("Failed to update user profile: ", err)
 		return helpers.SendResponse(e, 500, err.Error(), nil)
