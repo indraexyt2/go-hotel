@@ -46,6 +46,7 @@ func (s *LoginService) Login(ctx context.Context, req *models.LoginRequest) (*mo
 		UserID:       userData.ID,
 		Token:        token,
 		RefreshToken: refreshToken,
+		Source:       "internal",
 	}
 
 	err = s.UserRepository.AddUserSession(ctx, userSession)
@@ -69,7 +70,7 @@ func (s *LoginService) RefreshToken(ctx context.Context, refreshToken string, cl
 		return nil, err
 	}
 
-	err = s.UserRepository.UpdateUserSession(ctx, token, refreshToken)
+	err = s.UserRepository.UpdateUserSession(ctx, token, refreshToken, claimsToken.ExpiresAt.Time)
 	if err != nil {
 		return nil, err
 	}

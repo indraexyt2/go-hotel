@@ -14,8 +14,8 @@ func NewGetUserService(userRepo interfaces.IUserRepository) *GetUserService {
 	return &GetUserService{UserRepository: userRepo}
 }
 
-func (s *GetUserService) GetUser(ctx context.Context, id int) (*models.User, error) {
-	resp, err := s.UserRepository.GetUserById(ctx, id)
+func (s *GetUserService) GetUser(ctx context.Context, userEmail string) (*models.User, error) {
+	resp, err := s.UserRepository.GetUserByEmail(ctx, userEmail)
 	if err != nil {
 		return nil, err
 	}

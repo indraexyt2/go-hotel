@@ -307,8 +307,8 @@ func (r *UserRepository) GetUserSessionByToken(ctx context.Context, token string
 	return &userSession, nil
 }
 
-func (r *UserRepository) UpdateUserSession(ctx context.Context, token, refreshToken string) error {
-	return r.DB.WithContext(ctx).Model(&models.UserSession{}).Where("refresh_token = ?", refreshToken).Update("token", token).Error
+func (r *UserRepository) UpdateUserSession(ctx context.Context, token, refreshToken string, expiry time.Time) error {
+	return r.DB.WithContext(ctx).Model(&models.UserSession{}).Where("refresh_token = ?", refreshToken).Updates(map[string]interface{}{"token": token, "expires_at": expiry}).Error
 }
 
 func (r *UserRepository) DeleteUserSession(ctx context.Context, token string) error {

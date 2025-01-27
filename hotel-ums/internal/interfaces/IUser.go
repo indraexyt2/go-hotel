@@ -3,6 +3,7 @@ package interfaces
 import (
 	"context"
 	"hotel-ums/internal/models"
+	"time"
 )
 
 type IUserRepository interface {
@@ -19,7 +20,7 @@ type IUserRepository interface {
 	AddUserSession(ctx context.Context, userSession *models.UserSession) error
 	GetUserSessionByRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error)
 	GetUserSessionByToken(ctx context.Context, token string) (*models.UserSession, error)
-	UpdateUserSession(ctx context.Context, token, refreshToken string) error
+	UpdateUserSession(ctx context.Context, token, refreshToken string, expiry time.Time) error
 
 	DeleteUserSession(ctx context.Context, token string) error
 }
