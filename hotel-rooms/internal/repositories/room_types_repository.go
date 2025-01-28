@@ -34,3 +34,7 @@ func (r *RoomTypesRepository) GetRoomTypesDetails(ctx context.Context, id int) (
 func (r *RoomTypesRepository) AddRoomType(ctx context.Context, roomType *models.RoomType) error {
 	return r.DB.WithContext(ctx).Create(roomType).Error
 }
+
+func (r *RoomTypesRepository) UpdateRoomType(ctx context.Context, roomType map[string]interface{}, id int) error {
+	return r.DB.WithContext(ctx).Model(&models.RoomType{}).Select("name", "description", "price_per_night", "capacity", "total_rooms").Where("id = ?", id).Updates(roomType).Error
+}

@@ -76,3 +76,35 @@ func (api *RoomTypesAPI) AddRoomType(e echo.Context) error {
 
 	return helpers.SendResponse(e, http.StatusOK, "success", nil)
 }
+
+func (api *RoomTypesAPI) UpdateRoomType(e echo.Context) error {
+	var (
+		log = helpers.Logger
+		req = &models.RoomType{}
+	)
+
+	id := e.Param("id")
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error("failed to convert id to int: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	if err := e.Bind(req); err != nil {
+		log.Error("failed to bind request: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	if err := req.Validate(); err != nil {
+		log.Error("failed to validate request: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	err = api.RoomTypesSVC.UpdateRoomType(e.Request().Context(), req, idInt)
+	if err != nil {
+		log.Error("failed to update room type: ", err)
+		return helpers.SendResponse(e, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	return helpers.SendResponse(e, http.StatusOK, "success", nil)
+}

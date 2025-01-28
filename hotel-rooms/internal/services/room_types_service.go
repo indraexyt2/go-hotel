@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"hotel-rooms/internal/interfaces"
 	"hotel-rooms/internal/models"
 )
@@ -24,4 +25,19 @@ func (s *RoomTypesService) GetRoomTypesDetails(ctx context.Context, id int) (*mo
 
 func (s *RoomTypesService) AddRoomType(ctx context.Context, roomType *models.RoomType) error {
 	return s.roomTypesRepo.AddRoomType(ctx, roomType)
+}
+
+func (s *RoomTypesService) UpdateRoomType(ctx context.Context, roomType *models.RoomType, id int) error {
+	jsonRoomType, err := json.Marshal(roomType)
+	if err != nil {
+		return err
+	}
+
+	newData := make(map[string]interface{})
+	err = json.Unmarshal(jsonRoomType, &newData)
+	if err != nil {
+		return err
+	}
+
+	return s.roomTypesRepo.UpdateRoomType(ctx, newData, id)
 }
