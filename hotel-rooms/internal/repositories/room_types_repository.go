@@ -24,3 +24,9 @@ func (r *RoomTypesRepository) GetAllRoomTypes(ctx context.Context) ([]models.Roo
 	}
 	return roomTypes, nil
 }
+
+func (r *RoomTypesRepository) GetRoomTypesDetails(ctx context.Context, id int) (*models.RoomType, error) {
+	var roomType models.RoomType
+	r.DB.WithContext(ctx).Model(&models.RoomType{}).Where("id = ?", id).Preload("RoomPhotos").Preload("RoomFeatures").First(&roomType)
+	return &roomType, nil
+}

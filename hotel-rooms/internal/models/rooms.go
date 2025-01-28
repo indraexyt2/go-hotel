@@ -31,9 +31,6 @@ type RoomFeature struct {
 	Features   string    `gorm:"type:varchar(50);not null" json:"features" validate:"required"`
 	CreatedAt  time.Time `gorm:"autoCreateTime" json:"-"`
 	UpdatedAt  time.Time `gorm:"autoUpdateTime" json:"-"`
-
-	// Relationship
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID" json:"room_type"`
 }
 
 func (I *RoomFeature) Validate() error {
@@ -48,9 +45,6 @@ type RoomPhoto struct {
 	IsPrimary  bool      `gorm:"type:boolean;not null;default:false" json:"is_primary"`
 	CreatedAt  time.Time `gorm:"autoCreateTime" json:"-"`
 	UpdatedAt  time.Time `gorm:"autoUpdateTime" json:"-"`
-
-	// Relationship
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID" json:"room_type"`
 }
 
 type Room struct {

@@ -20,6 +20,7 @@ func ServeHTTP() {
 
 	roomV1 := e.Group("/api/room/v1")
 	roomV1.GET("/room-types", d.RoomTypesAPI.GetAllRoomTypes)
+	roomV1.GET("/room-types/:id", d.RoomTypesAPI.GetRoomTypesDetails)
 
 	err := e.Start(":" + os.Getenv("ROOM_APP_PORT"))
 	if err != nil {
