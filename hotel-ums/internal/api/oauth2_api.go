@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 	"hotel-ums/helpers"
@@ -61,7 +60,6 @@ func (api *OAuth2API) LoginCallback(e echo.Context) error {
 		return helpers.SendResponse(e, 500, err.Error(), nil)
 	}
 
-	fmt.Println("refresh token: ", token.RefreshToken)
 	err = api.OAuth2Service.GoogleLogin(e.Request().Context(), userRequest, token)
 	if err != nil {
 		log.Error("failed to login: ", err)
