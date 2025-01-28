@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"hotel-rooms/helpers"
 	"hotel-rooms/internal/interfaces"
+	"hotel-rooms/internal/models"
 	"net/http"
 	"strconv"
 )
@@ -49,4 +50,29 @@ func (api *RoomTypesAPI) GetRoomTypesDetails(e echo.Context) error {
 	}
 
 	return helpers.SendResponse(e, http.StatusOK, "success", resp)
+}
+
+func (api *RoomTypesAPI) AddRoomType(e echo.Context) error {
+	var (
+		log = helpers.Logger
+		req = &models.RoomType{}
+	)
+
+	if err := e.Bind(req); err != nil {
+		log.Error("failed to bind request: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	if err := req.Validate(); err != nil {
+		log.Error("failed to validate request: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	err := api.RoomTypesSVC.AddRoomType(e.Request().Context(), req)
+	if err != nil {
+		log.Error("failed to add room type: ", err)
+		return helpers.SendResponse(e, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	return helpers.SendResponse(e, http.StatusOK, "success", nil)
 }

@@ -21,6 +21,7 @@ func ServeHTTP() {
 	roomV1 := e.Group("/api/room/v1")
 	roomV1.GET("/room-types", d.RoomTypesAPI.GetAllRoomTypes)
 	roomV1.GET("/room-types/:id", d.RoomTypesAPI.GetRoomTypesDetails)
+	roomV1.POST("/room-types", d.RoomTypesAPI.AddRoomType, d.MiddlewareAdminAuthorization)
 
 	err := e.Start(":" + os.Getenv("ROOM_APP_PORT"))
 	if err != nil {

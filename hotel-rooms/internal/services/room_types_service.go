@@ -21,3 +21,7 @@ func (s *RoomTypesService) GetAllRoomTypes(ctx context.Context) ([]models.RoomTy
 func (s *RoomTypesService) GetRoomTypesDetails(ctx context.Context, id int) (*models.RoomType, error) {
 	return s.roomTypesRepo.GetRoomTypesDetails(ctx, id)
 }
+
+func (s *RoomTypesService) AddRoomType(ctx context.Context, roomType *models.RoomType) error {
+	return s.roomTypesRepo.AddRoomType(ctx, roomType)
+}

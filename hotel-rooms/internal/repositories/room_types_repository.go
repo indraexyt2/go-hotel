@@ -30,3 +30,7 @@ func (r *RoomTypesRepository) GetRoomTypesDetails(ctx context.Context, id int) (
 	r.DB.WithContext(ctx).Model(&models.RoomType{}).Where("id = ?", id).Preload("RoomPhotos").Preload("RoomFeatures").First(&roomType)
 	return &roomType, nil
 }
+
+func (r *RoomTypesRepository) AddRoomType(ctx context.Context, roomType *models.RoomType) error {
+	return r.DB.WithContext(ctx).Create(roomType).Error
+}

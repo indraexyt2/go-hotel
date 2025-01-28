@@ -35,13 +35,13 @@ func (d *Dependencies) MiddlewareAdminAuthorization(next echo.HandlerFunc) echo.
 			log = helpers.Logger
 		)
 
-		token := e.Get("Authorization")
+		token := e.Request().Header.Get("Authorization")
 		if token == "" {
 			log.Error("token not found")
 			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
 		}
 
-		userData, err := d.External.ValidateUser(e.Request().Context(), token.(string))
+		userData, err := d.External.ValidateUser(e.Request().Context(), token)
 		if err != nil {
 			log.Error("failed to validate user: ", err)
 			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
