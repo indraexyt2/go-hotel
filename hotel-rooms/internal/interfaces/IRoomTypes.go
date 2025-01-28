@@ -11,6 +11,7 @@ type IRoomTypesRepository interface {
 	GetRoomTypesDetails(ctx context.Context, id int) (*models.RoomType, error)
 	AddRoomType(ctx context.Context, roomType *models.RoomType) error
 	UpdateRoomType(ctx context.Context, roomType map[string]interface{}, id int) error
+	DeleteRoomType(ctx context.Context, id int) error
 }
 
 type IRoomTypesService interface {
@@ -18,6 +19,7 @@ type IRoomTypesService interface {
 	GetRoomTypesDetails(ctx context.Context, id int) (*models.RoomType, error)
 	AddRoomType(ctx context.Context, roomType *models.RoomType) error
 	UpdateRoomType(ctx context.Context, roomType *models.RoomType, id int) error
+	DeleteRoomType(ctx context.Context, id int) error
 }
 
 type IRoomTypesAPI interface {
@@ -25,4 +27,5 @@ type IRoomTypesAPI interface {
 	GetRoomTypesDetails(e echo.Context) error
 	AddRoomType(e echo.Context) error
 	UpdateRoomType(e echo.Context) error
+	DeleteRoomType(e echo.Context) error
 }

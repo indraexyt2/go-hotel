@@ -41,3 +41,7 @@ func (s *RoomTypesService) UpdateRoomType(ctx context.Context, roomType *models.
 
 	return s.roomTypesRepo.UpdateRoomType(ctx, newData, id)
 }
+
+func (s *RoomTypesService) DeleteRoomType(ctx context.Context, id int) error {
+	return s.roomTypesRepo.DeleteRoomType(ctx, id)
+}

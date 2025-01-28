@@ -38,3 +38,7 @@ func (r *RoomTypesRepository) AddRoomType(ctx context.Context, roomType *models.
 func (r *RoomTypesRepository) UpdateRoomType(ctx context.Context, roomType map[string]interface{}, id int) error {
 	return r.DB.WithContext(ctx).Model(&models.RoomType{}).Select("name", "description", "price_per_night", "capacity", "total_rooms").Where("id = ?", id).Updates(roomType).Error
 }
+
+func (r *RoomTypesRepository) DeleteRoomType(ctx context.Context, id int) error {
+	return r.DB.WithContext(ctx).Where("id = ?", id).Delete(&models.RoomType{}).Error
+}

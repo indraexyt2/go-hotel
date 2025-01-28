@@ -23,6 +23,7 @@ func ServeHTTP() {
 	roomV1.GET("/room-types/:id", d.RoomTypesAPI.GetRoomTypesDetails)
 	roomV1.POST("/room-types", d.RoomTypesAPI.AddRoomType, d.MiddlewareAdminAuthorization)
 	roomV1.PUT("/room-types/:id", d.RoomTypesAPI.UpdateRoomType, d.MiddlewareAdminAuthorization)
+	roomV1.DELETE("/room-types/:id", d.RoomTypesAPI.DeleteRoomType, d.MiddlewareAdminAuthorization)
 
 	err := e.Start(":" + os.Getenv("ROOM_APP_PORT"))
 	if err != nil {

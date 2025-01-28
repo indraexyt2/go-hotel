@@ -16,8 +16,8 @@ type RoomType struct {
 	UpdatedAt     time.Time `gorm:"autoUpdateTime" json:"-"`
 
 	// Relationships
-	RoomFeatures []RoomFeature `gorm:"foreignKey:RoomTypeID" json:"room_features"`
-	RoomPhotos   []RoomPhoto   `gorm:"foreignKey:RoomTypeID" json:"room_photos"`
+	RoomFeatures []RoomFeature `gorm:"foreignKey:RoomTypeID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"room_features"`
+	RoomPhotos   []RoomPhoto   `gorm:"foreignKey:RoomTypeID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"room_photos"`
 }
 
 func (I *RoomType) Validate() error {
@@ -56,7 +56,7 @@ type Room struct {
 	UpdatedAt   time.Time `gorm:"autoUpdateTime" json:"-"`
 
 	// Relationship
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID" json:"room_type"`
+	RoomType RoomType `gorm:"foreignKey:RoomTypeID;onUpdate:CASCADE,onDelete:CASCADE" json:"room_type"`
 }
 
 func (I *Room) Validate() error {

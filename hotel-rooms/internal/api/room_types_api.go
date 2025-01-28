@@ -108,3 +108,24 @@ func (api *RoomTypesAPI) UpdateRoomType(e echo.Context) error {
 
 	return helpers.SendResponse(e, http.StatusOK, "success", nil)
 }
+
+func (api *RoomTypesAPI) DeleteRoomType(e echo.Context) error {
+	var (
+		log = helpers.Logger
+	)
+
+	id := e.Param("id")
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		log.Error("failed to convert id to int: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	err = api.RoomTypesSVC.DeleteRoomType(e.Request().Context(), idInt)
+	if err != nil {
+		log.Error("failed to delete room type: ", err)
+		return helpers.SendResponse(e, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	return helpers.SendResponse(e, http.StatusOK, "success", nil)
+}
