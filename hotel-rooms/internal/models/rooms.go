@@ -18,7 +18,6 @@ type RoomType struct {
 	// Relationships
 	RoomFeatures []RoomFeature `gorm:"foreignKey:RoomTypeID" json:"room_features"`
 	RoomPhotos   []RoomPhoto   `gorm:"foreignKey:RoomTypeID" json:"room_photos"`
-	Rooms        []Room        `gorm:"foreignKey:RoomTypeID" json:"rooms"`
 }
 
 func (I *RoomType) Validate() error {
