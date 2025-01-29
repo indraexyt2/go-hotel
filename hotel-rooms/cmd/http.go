@@ -25,6 +25,11 @@ func ServeHTTP() {
 	roomV1.PUT("/room-types/:id", d.RoomTypesAPI.UpdateRoomType, d.MiddlewareAdminAuthorization)
 	roomV1.DELETE("/room-types/:id", d.RoomTypesAPI.DeleteRoomType, d.MiddlewareAdminAuthorization)
 
+	roomV1.POST("/room-types/features", d.RoomFeaturesAPI.AddRoomFeature, d.MiddlewareAdminAuthorization)
+	roomV1.GET("/room-types/:roomTypeId/features", d.RoomFeaturesAPI.GetAllRoomFeatures)
+	roomV1.PUT("/room-types/features/:id", d.RoomFeaturesAPI.EditRoomFeature, d.MiddlewareAdminAuthorization)
+	roomV1.DELETE("/room-types/features/:id", d.RoomFeaturesAPI.DeleteRoomFeature, d.MiddlewareAdminAuthorization)
+
 	err := e.Start(":" + os.Getenv("ROOM_APP_PORT"))
 	if err != nil {
 		return
@@ -34,7 +39,8 @@ func ServeHTTP() {
 type Dependencies struct {
 	External *external.External
 
-	RoomTypesAPI interfaces.IRoomTypesAPI
+	RoomTypesAPI    interfaces.IRoomTypesAPI
+	RoomFeaturesAPI interfaces.IRoomFeaturesAPI
 }
 
 func DependencyInjection() *Dependencies {
@@ -44,9 +50,14 @@ func DependencyInjection() *Dependencies {
 	roomTypesSvc := services.NewRoomTypesService(roomTypesRepo)
 	roomTypesApi := api.NewRoomTypesAPI(roomTypesSvc)
 
+	roomFeaturesRepo := repositories.NewRoomFeaturesRepository(helpers.DB)
+	roomFeaturesSvc := services.NewRoomFeaturesService(roomFeaturesRepo)
+	roomFeaturesApi := api.NewRoomFeaturesAPI(roomFeaturesSvc)
+
 	return &Dependencies{
 		External: ext,
 
-		RoomTypesAPI: roomTypesApi,
+		RoomTypesAPI:    roomTypesApi,
+		RoomFeaturesAPI: roomFeaturesApi,
 	}
 }

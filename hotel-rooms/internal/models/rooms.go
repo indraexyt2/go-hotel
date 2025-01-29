@@ -26,7 +26,7 @@ func (I *RoomType) Validate() error {
 }
 
 type RoomFeature struct {
-	ID         uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	ID         uint      `gorm:"primaryKey;autoIncrement" json:"id,omitempty"`
 	RoomTypeID uint      `gorm:"type:int;not null" json:"room_type_id" validate:"required"`
 	Features   string    `gorm:"type:varchar(50);not null" json:"features" validate:"required"`
 	CreatedAt  time.Time `gorm:"autoCreateTime" json:"-"`
