@@ -52,14 +52,20 @@ type Room struct {
 	RoomNumber  string    `gorm:"type:varchar(10);unique;not null" json:"room_number" validate:"required"`
 	RoomTypeID  uint      `gorm:"type:int;not null" json:"room_type_id" validate:"required"`
 	Description string    `gorm:"type:text" json:"description" validate:"required"`
+	Available   bool      `gorm:"-" json:"available"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"-"`
 	UpdatedAt   time.Time `gorm:"autoUpdateTime" json:"-"`
 
 	// Relationship
-	RoomType RoomType `gorm:"foreignKey:RoomTypeID;onUpdate:CASCADE,onDelete:CASCADE" json:"room_type"`
+	RoomType *RoomType `gorm:"foreignKey:RoomTypeID;onUpdate:CASCADE,onDelete:CASCADE" json:"room_type,omitempty"`
 }
 
 func (I *Room) Validate() error {
 	v := validator.New()
 	return v.Struct(I)
+}
+
+type RoomBookedResponse struct {
+	RoomTypeID  int `json:"room_type_id"`
+	TotalBooked int `json:"total_booked"`
 }
