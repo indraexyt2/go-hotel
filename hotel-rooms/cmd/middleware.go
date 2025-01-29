@@ -47,6 +47,11 @@ func (d *Dependencies) MiddlewareAdminAuthorization(next echo.HandlerFunc) echo.
 			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
 		}
 
+		if userData == nil {
+			log.Error("user not found")
+			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
+		}
+
 		if userData.Role != "admin" {
 			log.Error("only admin can access!")
 			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
