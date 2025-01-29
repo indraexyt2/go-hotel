@@ -71,7 +71,7 @@ func DependencyInjection() *Dependencies {
 	roomPhotosSvc := services.NewRoomPhotosService(roomPhotosRepo)
 	roomPhotosApi := api.NewRoomPhotosAPI(roomPhotosSvc)
 
-	roomsRepo := repositories.NewRoomsRepository(helpers.DB)
+	roomsRepo := repositories.NewRoomsRepository(helpers.DB, helpers.RedisClient)
 	roomsSvc := services.NewRoomService(roomsRepo)
 	roomsApi := api.NewRoomsAPI(roomsSvc, ext)
 
