@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"hotel-payments/internal/models"
 	"os"
 )
 
@@ -13,16 +14,22 @@ func SetupDB() {
 	var err error
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Jakarta",
-		os.Getenv("PAYMENTS_DB_HOST"),
-		os.Getenv("PAYMENTS_DB_PORT"),
-		os.Getenv("PAYMENTS_DB_USER"),
-		os.Getenv("PAYMENTS_DB_PASSWORD"),
-		os.Getenv("PAYMENTS_DB_NAME"),
+		os.Getenv("PAYMENT_DB_HOST"),
+		os.Getenv("PAYMENT_DB_PORT"),
+		os.Getenv("PAYMENT_DB_USER"),
+		os.Getenv("PAYMENT_DB_PASSWORD"),
+		os.Getenv("PAYMENT_DB_NAME"),
 	)
 
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		Logger.Error("Failed to connect to database: ", err)
+		return
+	}
+
+	err = DB.AutoMigrate(&models.Payment{}, &models.MidtransTransaction{})
+	if err != nil {
+		Logger.Error("Failed to migrate database: ", err)
 		return
 	}
 

@@ -1,84 +1,56 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
+	"encoding/json"
 	"github.com/IBM/sarama"
 	"hotel-payments/helpers"
-	"log"
+	"hotel-payments/internal/models"
 	"os"
+	"strconv"
 	"strings"
-	"sync"
 )
 
-type Consumer struct {
-	Ready chan bool
-}
-
-func (c *Consumer) Setup(sarama.ConsumerGroupSession) error {
-	close(c.Ready)
-	return nil
-}
-
-func (c *Consumer) Cleanup(sarama.ConsumerGroupSession) error {
-	return nil
-}
-
-func (c *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	for {
-		select {
-		case message := <-claim.Messages():
-			helpers.Logger.Info(fmt.Sprintf("Message topic:%s partition:%d offset:%d", message.Topic, message.Partition, message.Offset))
-
-			fmt.Printf("Message value: %s\n", string(message.Value))
-
-			session.MarkMessage(message, "")
-		case <-session.Context().Done():
-			return nil
-		}
-	}
-}
-
 func ServeKafkaConsumer() {
-	config := sarama.NewConfig()
-	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
-	config.Consumer.Offsets.Initial = sarama.OffsetOldest
-
+	d := DependencyInjection()
 	brokers := strings.Split(os.Getenv("KAFKA_HOSTS"), ",")
-	topics := os.Getenv("KAFKA_TOPIC_INITIATE_BOOKING")
-	group := "BOOKING:PAYMENTS"
+	topic := os.Getenv("KAFKA_TOPIC_INITIATE_BOOKING")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	client, err := sarama.NewConsumerGroup(brokers, group, config)
+	config := sarama.NewConfig()
+	config.Consumer.Return.Errors = true
+	config.Consumer.Offsets.AutoCommit.Enable = true
+
+	consumer, err := sarama.NewConsumer(brokers, config)
 	if err != nil {
-		log.Panicf("Error creating consumer group client: %v", err)
+		helpers.Logger.Error("Error creating Kafka consumer: ", err)
+		return
 	}
 
-	consumer := Consumer{
-		Ready: make(chan bool),
-	}
-
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for {
-			if ctx.Err() != nil {
+	partitionNumberStr := os.Getenv("KAFKA_PARTITION_NUMBER")
+	partitionNumber, _ := strconv.Atoi(partitionNumberStr)
+	for i := 0; i < partitionNumber; i++ {
+		go func() {
+			partitionConsumer, err := consumer.ConsumePartition(topic, int32(i), sarama.OffsetNewest)
+			if err != nil {
+				helpers.Logger.Error("Error consuming Kafka partition: ", err)
 				return
 			}
-			err := client.Consume(ctx, []string{topics}, &consumer)
-			if err != nil {
-				log.Printf("Error from consumer: %v", err)
+
+			for msg := range partitionConsumer.Messages() {
+				helpers.Logger.Info("Received message payment processed by consumer: ", string(msg.Value))
+
+				var reqBooking models.Booking
+				err = json.Unmarshal(msg.Value, &reqBooking)
+				if err != nil {
+					helpers.Logger.Error("Error unmarshalling Kafka message: ", err)
+					return
+				}
+
+				err = d.PaymentsAPI.ProcessPayment(&reqBooking)
+				if err != nil {
+					helpers.Logger.Error("Error processing payment: ", err)
+					return
+				}
 			}
-			consumer.Ready = make(chan bool)
-		}
-	}()
-
-	<-consumer.Ready
-
-	wg.Wait()
-	if err = client.Close(); err != nil {
-		log.Panicf("Error closing client: %v", err)
+		}()
 	}
 }
