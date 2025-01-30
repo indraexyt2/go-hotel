@@ -15,9 +15,6 @@ func main() {
 	// setup redis
 	helpers.SetupRedis()
 
-	// setup midtrans
-	helpers.SetupMidtrans()
-
 	// setup kafka
 	go cmd.ServeKafkaConsumer()
 
