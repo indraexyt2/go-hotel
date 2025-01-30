@@ -20,12 +20,16 @@ func NewPaymentService(paymentRepo interfaces.IPaymentsRepository) *PaymentServi
 }
 
 func (s *PaymentService) CreatePayment(ctx context.Context, req *models.Booking, snapURL string) error {
+	timeNow := int(time.Now().Unix()) + rand.Intn(100)
+	transactionID := strconv.Itoa(timeNow)
+
 	newPayment := &models.Payment{
-		TransactionID: string(rune(int(time.Now().Unix()) + rand.Intn(100))),
+		TransactionID: transactionID,
 		BookingID:     int(req.ID),
 		GuestID:       int(req.GuestID),
 		FullName:      req.FullName,
 		RoomID:        int(req.RoomID),
+		GrossAmount:   req.TotalPrice,
 		SnapLink:      snapURL,
 	}
 	return s.PaymentRepository.CreatePayment(ctx, newPayment)
@@ -81,5 +85,5 @@ func (s *PaymentService) UpdatePayment(ctx context.Context, req map[string]inter
 		"fraud_status":       fraudStatus,
 	}
 
-	return s.PaymentRepository.UpdatePayment(ctx, updateData)
+	return s.PaymentRepository.UpdatePayment(ctx, updateData, orderIdStr)
 }

@@ -9,7 +9,7 @@ import (
 type IPaymentsRepository interface {
 	CreatePayment(ctx context.Context, req *models.Payment) error
 	GetPaymentById(ctx context.Context, bookingID int) (*models.Payment, error)
-	UpdatePayment(ctx context.Context, req map[string]interface{}) error
+	UpdatePayment(ctx context.Context, req map[string]interface{}, bookingID string) error
 }
 
 type IPaymentsService interface {

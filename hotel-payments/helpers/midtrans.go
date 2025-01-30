@@ -7,7 +7,7 @@ import (
 )
 
 func SnapClient() *snap.Client {
-	var s *snap.Client
+	s := &snap.Client{}
 	s.New(os.Getenv("MIDTRANS_SERVER_KEY"), midtrans2.Sandbox)
 	return s
 }

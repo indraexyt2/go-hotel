@@ -26,6 +26,6 @@ func (r *PaymentsRepository) GetPaymentById(ctx context.Context, bookingID int) 
 	return &payment, err
 }
 
-func (r *PaymentsRepository) UpdatePayment(ctx context.Context, req map[string]interface{}) error {
-	return r.DB.WithContext(ctx).Model(&models.Payment{}).Where("booking_id = ?", req["booking_id"]).Updates(req).Error
+func (r *PaymentsRepository) UpdatePayment(ctx context.Context, req map[string]interface{}, bookingID string) error {
+	return r.DB.Debug().WithContext(ctx).Model(&models.Payment{}).Where("booking_id = ?", bookingID).Updates(req).Error
 }
