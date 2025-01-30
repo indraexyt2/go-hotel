@@ -27,7 +27,7 @@ func SetupDB() {
 		return
 	}
 
-	err = DB.AutoMigrate(&models.Payment{}, &models.MidtransTransaction{})
+	err = DB.AutoMigrate(&models.Payment{})
 	if err != nil {
 		Logger.Error("Failed to migrate database: ", err)
 		return
