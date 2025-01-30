@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"hotel-rooms/helpers"
 	"hotel-rooms/internal/interfaces"
@@ -139,10 +140,23 @@ func (api *RoomsAPI) GetRoomAvailability(e echo.Context) error {
 		log = helpers.Logger
 	)
 
-	totalBooked, err := api.External.GetTotalBooked(e.Request().Context())
+	checkinDate := e.QueryParam("checkinDate")
+	checkoutDate := e.QueryParam("checkoutDate")
+
+	if checkinDate == "" || checkoutDate == "" {
+		log.Error("checkinDate or checkoutDate not found")
+		return helpers.SendResponse(e, http.StatusBadRequest, "checkin date or checkout date not found", nil)
+	}
+
+	totalBooked, err := api.External.GetTotalBooked(e.Request().Context(), checkinDate, checkoutDate)
 	if err != nil {
 		log.Error("failed to get total booked: ", err)
 		return helpers.SendResponse(e, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	if totalBooked == nil {
+		fmt.Println("totalBooked is nil")
+		return helpers.SendResponse(e, http.StatusOK, "success", nil)
 	}
 
 	resp, err := api.RoomsSVC.GetRoomAvailability(e.Request().Context(), totalBooked)
