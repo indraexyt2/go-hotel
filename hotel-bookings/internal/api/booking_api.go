@@ -59,6 +59,7 @@ func (api *BookingAPI) AddBooking(e echo.Context) error {
 		RoomTypeID:   req.RoomTypeID,
 		RoomID:       req.RoomID,
 		GuestID:      claims.ID,
+		FullName:     claims.FullName,
 		CheckinDate:  checkinDateParsed,
 		CheckoutDate: checkoutDateParsed,
 		TotalPrice:   req.TotalPrice,
