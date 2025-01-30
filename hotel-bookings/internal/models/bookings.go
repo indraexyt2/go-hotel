@@ -11,6 +11,7 @@ type Booking struct {
 	RoomID       uint      `gorm:"not null;index" json:"room_id" validate:"required"`
 	GuestID      uint      `gorm:"not null;index" json:"guest_id" validate:"required"`
 	FullName     string    `gorm:"not null" json:"full_name" validate:"required"`
+	Email        string    `gorm:"not null" json:"email" validate:"required,email"`
 	CheckinDate  time.Time `gorm:"not null" json:"checkin_date"`
 	CheckoutDate time.Time `gorm:"not null" json:"checkout_date"`
 	TotalPrice   float64   `gorm:"type:decimal(10,2);not null" json:"total_price"`
