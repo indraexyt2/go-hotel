@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	midtrans2 "github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
@@ -27,16 +26,14 @@ func NewPaymentAPI(paymentSvc interfaces.IPaymentsService, snapClient *snap.Clie
 }
 
 func (api *PaymentAPI) ProcessPayment(req *models.Booking) error {
-	var (
-		log = helpers.Logger
-	)
-
 	snapReq := &snap.Request{
 		TransactionDetails: midtrans2.TransactionDetails(midtrans.TransactionDetails{
 			OrderID:  strconv.Itoa(int(req.ID)),
 			GrossAmt: int64(req.TotalPrice),
 		}),
-		CustomerDetail: &midtrans2.CustomerDetails{},
+		CustomerDetail: &midtrans2.CustomerDetails{
+			FName: req.FullName,
+		},
 	}
 
 	snapResp, err := api.SnapClient.CreateTransaction(snapReq)
@@ -49,7 +46,6 @@ func (api *PaymentAPI) ProcessPayment(req *models.Booking) error {
 		return err2
 	}
 
-	log.Info(fmt.Printf("Payment URL for Order, Token %s: %s", snapResp.Token, snapResp.RedirectURL))
 	return nil
 }
 
@@ -59,7 +55,7 @@ func (api *PaymentAPI) ProcessPaymentCallback(e echo.Context) error {
 		req = map[string]interface{}{}
 	)
 
-	if err := e.Bind(req); err != nil {
+	if err := e.Bind(&req); err != nil {
 		log.Error("Failed to bind request: ", err)
 		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
 	}
