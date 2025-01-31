@@ -39,6 +39,10 @@ func (s *PaymentService) GetPaymentById(ctx context.Context, bookingID int) (*mo
 	return s.PaymentRepository.GetPaymentById(ctx, bookingID)
 }
 
+func (s *PaymentService) GetPaymentByIdAndUserId(ctx context.Context, bookingID, guestID int) (*models.Payment, error) {
+	return s.PaymentRepository.GetPaymentByIdAndUserId(ctx, bookingID, guestID)
+}
+
 func (s *PaymentService) UpdatePayment(ctx context.Context, req map[string]interface{}) error {
 	orderIdStr, exists := req["order_id"].(string)
 	if !exists {
@@ -86,4 +90,19 @@ func (s *PaymentService) UpdatePayment(ctx context.Context, req map[string]inter
 	}
 
 	return s.PaymentRepository.UpdatePayment(ctx, updateData, orderIdStr)
+}
+
+func (s *PaymentService) RefundPayment(ctx context.Context, newStatus string, bookingID int) error {
+	payment, err := s.PaymentRepository.GetPaymentById(ctx, bookingID)
+	if err != nil {
+		log.Error("Failed to get payment by order id: ", err)
+		return err
+	}
+
+	if payment == nil {
+		log.Error("Payment not found")
+		return errors.New("payment not found")
+	}
+
+	return s.PaymentRepository.UpdateStatusTransaction(ctx, newStatus, bookingID)
 }

@@ -24,6 +24,11 @@ func (d *Dependencies) MiddlewareAuthorization(next echo.HandlerFunc) echo.Handl
 			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
 		}
 
+		if userData == nil {
+			log.Error("failed to validate user: ", err)
+			return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
+		}
+
 		e.Set("token", userData)
 		return next(e)
 	}

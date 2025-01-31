@@ -42,3 +42,8 @@ type Booking struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
+
+type RefundRequest struct {
+	BookingID uint   `json:"booking_id" validate:"required"`
+	Reason    string `json:"reason" validate:"required"`
+}

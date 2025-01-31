@@ -20,6 +20,7 @@ func ServeHTTP() {
 
 	paymentV1 := e.Group("/api/payment/v1")
 	paymentV1.POST("/midtrans/notification", d.PaymentsAPI.ProcessPaymentCallback)
+	paymentV1.POST("/midtrans/refund", d.PaymentsAPI.RefundPayment, d.MiddlewareAuthorization)
 
 	err := e.Start(":" + os.Getenv("PAYMENT_APP_PORT"))
 	if err != nil {
@@ -40,7 +41,7 @@ func DependencyInjection() *Dependencies {
 
 	paymentRepo := repositories.NewPaymentsRepository(helpers.DB)
 	paymentSvc := services.NewPaymentService(paymentRepo)
-	paymentApi := api.NewPaymentAPI(paymentSvc, helpers.SnapClient())
+	paymentApi := api.NewPaymentAPI(paymentSvc, helpers.SnapClient(), helpers.CoreClient(), ext)
 
 	return &Dependencies{
 		External: ext,
