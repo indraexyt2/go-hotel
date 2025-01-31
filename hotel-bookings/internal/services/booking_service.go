@@ -76,7 +76,7 @@ func (s *BookingService) UpdateBookingStatus(ctx context.Context, bookingID int,
 	}
 
 	updateStatus := false
-	statusMapping := constants.UpdateStatusMapping[bookingOrder.Status]
+	statusMapping := constants.MidtransStatusMapping[bookingOrder.Status]
 	for _, v := range statusMapping {
 		if v == status {
 			updateStatus = true

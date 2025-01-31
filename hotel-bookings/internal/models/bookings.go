@@ -15,7 +15,7 @@ type Booking struct {
 	CheckinDate  time.Time `gorm:"not null" json:"checkin_date"`
 	CheckoutDate time.Time `gorm:"not null" json:"checkout_date"`
 	TotalPrice   float64   `gorm:"type:decimal(10,2);not null" json:"total_price"`
-	Status       string    `gorm:"type:booking_status;default:'pending'" json:"status"`
+	Status       string    `gorm:"type:varchar(50);not null;default:'pending'" json:"status"`
 	CreatedAt    time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt    time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
