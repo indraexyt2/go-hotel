@@ -21,6 +21,7 @@ func ServeHTTP() {
 	paymentV1 := e.Group("/api/payment/v1")
 	paymentV1.POST("/midtrans/notification", d.PaymentsAPI.ProcessPaymentCallback)
 	paymentV1.POST("/midtrans/refund", d.PaymentsAPI.RefundPayment, d.MiddlewareAuthorization)
+	paymentV1.GET("/:bookingID", d.PaymentsAPI.GetPaymentDetails, d.MiddlewareAuthorization)
 
 	err := e.Start(":" + os.Getenv("PAYMENT_APP_PORT"))
 	if err != nil {

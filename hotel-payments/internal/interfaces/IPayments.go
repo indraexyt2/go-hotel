@@ -26,4 +26,5 @@ type IPaymentsAPI interface {
 	ProcessPayment(req *models.Booking) error
 	ProcessPaymentCallback(e echo.Context) error
 	RefundPayment(e echo.Context) error
+	GetPaymentDetails(e echo.Context) error
 }
