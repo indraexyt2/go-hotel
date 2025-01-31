@@ -33,6 +33,7 @@ func (api *PaymentAPI) ProcessPayment(req *models.Booking) error {
 		}),
 		CustomerDetail: &midtrans2.CustomerDetails{
 			FName: req.FullName,
+			Email: req.Email,
 		},
 	}
 
