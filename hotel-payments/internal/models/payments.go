@@ -34,10 +34,16 @@ type Booking struct {
 	RoomID       uint      `json:"room_id" validate:"required"`
 	GuestID      uint      `json:"guest_id" validate:"required"`
 	FullName     string    `json:"full_name" validate:"required"`
+	Email        string    `json:"email" validate:"required,email"`
 	CheckinDate  time.Time `json:"checkin_date"`
 	CheckoutDate time.Time `json:"checkout_date"`
 	TotalPrice   float64   `json:"total_price"`
 	Status       string    `json:"status"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type RefundRequest struct {
+	BookingID uint   `json:"booking_id" validate:"required"`
+	Reason    string `json:"reason" validate:"required"`
 }

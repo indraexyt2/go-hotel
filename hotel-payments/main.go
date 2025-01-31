@@ -15,9 +15,10 @@ func main() {
 	// setup redis
 	helpers.SetupRedis()
 
-	// setup kafka
-	go cmd.ServeKafkaConsumer()
-
 	// serve http
-	cmd.ServeHTTP()
+	go cmd.ServeHTTP()
+
+	// setup kafka
+	cmd.ServeKafkaConsumer()
+
 }

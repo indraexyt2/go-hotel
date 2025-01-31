@@ -26,6 +26,16 @@ func (r *PaymentsRepository) GetPaymentById(ctx context.Context, bookingID int) 
 	return &payment, err
 }
 
+func (r PaymentsRepository) GetPaymentByIdAndUserId(ctx context.Context, bookingID, guestID int) (*models.Payment, error) {
+	var payment models.Payment
+	err := r.DB.WithContext(ctx).Where("booking_id = ?", bookingID).Where("guest_id = ?", guestID).First(&payment).Error
+	return &payment, err
+}
+
 func (r *PaymentsRepository) UpdatePayment(ctx context.Context, req map[string]interface{}, bookingID string) error {
 	return r.DB.Debug().WithContext(ctx).Model(&models.Payment{}).Where("booking_id = ?", bookingID).Updates(req).Error
+}
+
+func (r *PaymentsRepository) UpdateStatusTransaction(ctx context.Context, newStatus string, bookingID int) error {
+	return r.DB.WithContext(ctx).Model(&models.Payment{}).Where("booking_id = ?", bookingID).Update("transaction_status", newStatus).Error
 }
