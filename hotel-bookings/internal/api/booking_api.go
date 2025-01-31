@@ -1,12 +1,14 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"hotel-bookings/external"
 	"hotel-bookings/helpers"
 	"hotel-bookings/internal/interfaces"
 	"hotel-bookings/internal/models"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -213,6 +215,19 @@ func (api *BookingAPI) UpdateBookingStatus(e echo.Context) error {
 	if err := req.Validate(); err != nil {
 		log.Error("failed to validate request: ", err)
 		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	extSignature := e.Request().Header.Get("Signature")
+	jsonReq, err := json.Marshal(req)
+	if err != nil {
+		log.Error("failed to marshal request: ", err)
+		return helpers.SendResponse(e, http.StatusBadRequest, err.Error(), nil)
+	}
+
+	ok := helpers.VerifySignature(string(jsonReq), extSignature, os.Getenv("BOOKING_SECRET_KEY"))
+	if !ok {
+		log.Error("failed to verify signature")
+		return helpers.SendResponse(e, http.StatusUnauthorized, "unauthorized", nil)
 	}
 
 	if err := api.BookingSVC.UpdateBookingStatus(e.Request().Context(), idInt, req.Status); err != nil {
