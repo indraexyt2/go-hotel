@@ -13,10 +13,14 @@ import (
 
 type PaymentService struct {
 	PaymentRepository interfaces.IPaymentsRepository
+	External          interfaces.IExternal
 }
 
-func NewPaymentService(paymentRepo interfaces.IPaymentsRepository) *PaymentService {
-	return &PaymentService{PaymentRepository: paymentRepo}
+func NewPaymentService(paymentRepo interfaces.IPaymentsRepository, ext interfaces.IExternal) *PaymentService {
+	return &PaymentService{
+		PaymentRepository: paymentRepo,
+		External:          ext,
+	}
 }
 
 func (s *PaymentService) CreatePayment(ctx context.Context, req *models.Booking, snapURL string) error {
@@ -32,6 +36,7 @@ func (s *PaymentService) CreatePayment(ctx context.Context, req *models.Booking,
 		GrossAmount:   req.TotalPrice,
 		SnapLink:      snapURL,
 	}
+
 	return s.PaymentRepository.CreatePayment(ctx, newPayment)
 }
 
@@ -87,6 +92,12 @@ func (s *PaymentService) UpdatePayment(ctx context.Context, req map[string]inter
 		"currency":           currency,
 		"transaction_status": transactionStatus,
 		"fraud_status":       fraudStatus,
+	}
+
+	err = s.External.UpdateBookingStatus(ctx, orderIdStr, transactionStatus)
+	if err != nil {
+		log.Error("Failed to update booking status: ", err)
+		return err
 	}
 
 	return s.PaymentRepository.UpdatePayment(ctx, updateData, orderIdStr)

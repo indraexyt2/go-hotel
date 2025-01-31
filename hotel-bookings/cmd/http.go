@@ -24,7 +24,7 @@ func ServeHTTP() {
 	bookingV1.GET("/bookings/user/:id", d.BookingAPI.GetBookingByUserId, d.MiddlewareAuthorization)
 	bookingV1.GET("/bookings", d.BookingAPI.GetBookings, d.MiddlewareAdminAuthorization)
 	bookingV1.PUT("/bookings/:id", d.BookingAPI.EditBooking, d.MiddlewareAdminAuthorization)
-	bookingV1.PATCH("/bookings/:id/status", d.BookingAPI.UpdateBookingStatus, d.MiddlewareAdminAuthorization)
+	bookingV1.PATCH("/bookings/:id/status", d.BookingAPI.UpdateBookingStatus)
 	bookingV1.GET("/total-booked", d.BookingAPI.GetTotalBookings)
 
 	err := e.Start(":" + os.Getenv("BOOKING_APP_PORT"))

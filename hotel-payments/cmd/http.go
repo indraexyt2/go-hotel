@@ -40,7 +40,7 @@ func DependencyInjection() *Dependencies {
 	ext := external.NewExternal()
 
 	paymentRepo := repositories.NewPaymentsRepository(helpers.DB)
-	paymentSvc := services.NewPaymentService(paymentRepo)
+	paymentSvc := services.NewPaymentService(paymentRepo, ext)
 	paymentApi := api.NewPaymentAPI(paymentSvc, helpers.SnapClient(), helpers.CoreClient(), ext)
 
 	return &Dependencies{
