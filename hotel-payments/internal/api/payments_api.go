@@ -141,3 +141,30 @@ func (api *PaymentAPI) RefundPayment(e echo.Context) error {
 
 	return helpers.SendResponse(e, http.StatusOK, "success", nil)
 }
+
+func (api *PaymentAPI) GetPaymentDetails(e echo.Context) error {
+	var (
+		log = helpers.Logger
+	)
+
+	claims := e.Get("token").(*external.User)
+	if claims == nil {
+		log.Error("token not found")
+		return helpers.SendResponse(e, http.StatusBadRequest, "unauthorized", nil)
+	}
+
+	bookingId := e.Param("bookingID")
+	if bookingId == "" {
+		log.Error("booking id not found")
+		return helpers.SendResponse(e, http.StatusBadRequest, "unauthorized", nil)
+	}
+
+	bookingIdInt, _ := strconv.Atoi(bookingId)
+	resp, err := api.PaymentService.GetPaymentByIdAndUserId(e.Request().Context(), bookingIdInt, int(claims.ID))
+	if err != nil {
+		log.Error("booking not found")
+		return helpers.SendResponse(e, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	return helpers.SendResponse(e, http.StatusOK, "success", resp)
+}
