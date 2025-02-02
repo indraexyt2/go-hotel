@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/labstack/echo/v4"
+	"hotel-ums/external"
 	"hotel-ums/helpers"
 	"hotel-ums/internal/api"
 	"hotel-ums/internal/interfaces"
@@ -50,9 +51,10 @@ type Dependencies struct {
 }
 
 func DependencyInjection() *Dependencies {
+	ext := external.NewExternal()
 	userRepo := repositories.NewUserRepository(helpers.DB, helpers.RedisClient)
 
-	registerSvc := services.NewRegisterService(userRepo)
+	registerSvc := services.NewRegisterService(userRepo, ext)
 	registerApi := api.NewRegisterAPI(registerSvc)
 
 	loginSvc := services.NewLoginService(userRepo)

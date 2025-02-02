@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"hotel-ums/internal/interfaces"
@@ -13,11 +14,13 @@ import (
 
 type RegisterService struct {
 	UserRepository interfaces.IUserRepository
+	External       interfaces.IExternal
 }
 
-func NewRegisterService(userRepository interfaces.IUserRepository) *RegisterService {
+func NewRegisterService(userRepository interfaces.IUserRepository, ext interfaces.IExternal) *RegisterService {
 	return &RegisterService{
 		UserRepository: userRepository,
+		External:       ext,
 	}
 }
 
@@ -58,6 +61,21 @@ func (s *RegisterService) RegisterNewUser(ctx context.Context, user *models.User
 
 	resp = user
 	resp.Password = ""
+
+	notifyReq := &models.NotificationRequest{
+		TemplateName: "account_activation",
+		Recipient:    user.Email,
+		Placeholder: map[string]string{
+			"FullName":       user.FullName,
+			"ActivationLink": "http://localhost:8080/api/ums/v1/email-verification/" + user.EmailVerificationToken.Token,
+		},
+	}
+
+	jsonNotifyReq, _ := json.Marshal(notifyReq)
+	err = s.External.SendMessageNotification(ctx, jsonNotifyReq)
+	if err != nil {
+		return nil, err
+	}
 
 	return resp, nil
 }
