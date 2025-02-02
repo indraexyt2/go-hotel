@@ -2,7 +2,14 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"hotel-notification/helpers"
+	"hotel-notification/internal/handler"
+	"hotel-notification/internal/interfaces"
+	"hotel-notification/internal/models"
+	"hotel-notification/internal/repositories"
+	"hotel-notification/internal/services"
 	"log"
 	"os"
 	"os/signal"
@@ -12,6 +19,20 @@ import (
 
 	"github.com/IBM/sarama"
 )
+
+type Dependencies struct {
+	NotificationHandler interfaces.INotificationHandler
+}
+
+func DependencyInjection() *Dependencies {
+	notificationRepo := repositories.NewNotificationRepository(helpers.DB, helpers.RedisClient)
+	notificationSvc := services.NewNotificationService(notificationRepo)
+	notificationHandler := handler.NewNotificationHandler(notificationSvc)
+
+	return &Dependencies{
+		NotificationHandler: notificationHandler,
+	}
+}
 
 var (
 	brokers  = os.Getenv("KAFKA_HOSTS")
@@ -139,6 +160,7 @@ func (consumer *Consumer) Cleanup(sarama.ConsumerGroupSession) error {
 }
 
 func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	d := DependencyInjection()
 	for {
 		select {
 		case message, ok := <-claim.Messages():
@@ -148,6 +170,18 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 			}
 
 			// process message
+			var newNotification models.InternalNotificationRequest
+			err := json.Unmarshal(message.Value, &newNotification)
+			if err != nil {
+				log.Printf("failed to unmarshal message: %v", err)
+				return err
+			}
+
+			err = d.NotificationHandler.SendNotification(context.Background(), &newNotification)
+			if err != nil {
+				log.Printf("failed to send notification: %v", err)
+				return err
+			}
 
 			session.MarkMessage(message, "")
 		case <-session.Context().Done():

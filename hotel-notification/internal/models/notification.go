@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/go-playground/validator/v10"
+	"time"
+)
 
 type NotificationTemplate struct {
 	ID           int
@@ -30,7 +33,12 @@ func (*NotificationHistory) TableName() string {
 }
 
 type InternalNotificationRequest struct {
-	TemplateName string `valid:"required"`
-	Recipient    string `valid:"required"`
-	Placeholder  map[string]string
+	TemplateName string            `validate:"required"`
+	Recipient    string            `validate:"required"`
+	Placeholder  map[string]string `validate:"required"`
+}
+
+func (I *InternalNotificationRequest) Validate() error {
+	v := validator.New()
+	return v.Struct(I)
 }
