@@ -66,7 +66,7 @@ func ServeKafkaConsumer() {
 		log.Panicf("Error creating consumer group client: %v", err)
 	}
 
-	consumptionIsPaused := false
+	//consumptionIsPaused := false
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
@@ -104,8 +104,8 @@ func ServeKafkaConsumer() {
 		case <-sigterm:
 			log.Println("terminating: via signal")
 			keepRunning = false
-		case <-sigusr1:
-			toggleConsumptionFlow(client, &consumptionIsPaused)
+			//case <-sigusr1:
+			//	toggleConsumptionFlow(client, &consumptionIsPaused)
 		}
 	}
 	cancel()
